@@ -1,0 +1,8 @@
+def accuracy_score(y_true, y_pred):
+    '''Class performance metric that computes the accuracy and y_pred'''
+    correct = 0
+    for true, pred in zip(y_true, y_pred):
+        if true == pred:
+            correct += 1                                  # count the number of correct predictions
+    accuracy = correct/len(y_true)
+    return accuracy
