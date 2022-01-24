@@ -136,6 +136,12 @@ class NN(Model):
         output = self.predict(X)
         return self.loss(y, output)
 
+
+    def useLoss(self, func, func2):
+        """Determines the loss functions to use."""
+        self.loss, self.loss_prime = func, func2
+
+
 class Flatten(Layer):
 
     def forward(self, input):
@@ -214,5 +220,61 @@ class Conv2D(Layer):
         return self.loss(y, output)
         
 
+class Pooling2D(Layer):
+    def __init__(self, size=2, stride=1):
+        self.size = size
+        self.stride = stride
+
+    def pool(self, X_col):
+        raise NotImplementedError
+
+    def dpool(self, dX_col,dout_col,pool_cache):
+        raise NotImplementedError
+    
+    def forward(self, input):
+        self.X_shape = input.shape
+        n, h, w, d = input.shape
+        
+    
+        h_out = (h-self.size)/self.stride + 1
+        w_out = (w-self.size)/self.stride + 1
+
+        if not w_out.is_integer() or not h_out.is_integer():
+            raise Exception('Invalid output dimension')
+        
+        h_out,w_out = int(h_out), int(w_out)
+        X_reshaped = input.reshape(n*d,h,w,1)
+       
+        self.X_col, _ = im2col(X_reshaped, (self.size, self.size,1,1), pad=0, stride=self.stride) 
+      
+        out, self.max_idx = self.pool(self.X_col)
+        out = out.reshape(h_out,w_out,n,d)
+        out = out.transpose(2,0,1,3)
+        return out
+
+    def backward(self, output_error, learning_rate):
+        n, w, h, d = self.X_shape
+        dX_col = np.zeros_like(self.X_col)
+        dout_col = output_error.transpose(1,2,3,0).ravel()
+
+        dX = self.dpool(dX_col, dout_col, self.max_idx)
+        dX = col2im(dX, (n*d,h,w,1), (self.size, self.size,1,1), pad=0, stride=self.stride)
+        dX=dX.reshape(self.X_shape)
+        return dX
+
+#Max Pooling é uma operação de pooling que calcula o valor máximo para patches de um mapa de recursos e o usa para criar um mapa de recursos com amostragem reduzida (pool). Geralmente é usado após uma camada convolucional.
+
+
+class MaxPooling2D(Pooling2D):
+    
+    def pool(self, X_col):
+        out = np.amax(X_col, axis = 0) 
+        max_idx = np.argmax(X_col, axis=0)
+        return out, max_idx
+
+    def dpool(self, dX_col, dout_col, pool_cache):
+        for x, indx in enumerate(pool_cache):
+            dX_col[indx, x] = 1
+        return dX_col * dout_col
 
 
