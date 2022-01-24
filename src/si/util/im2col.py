@@ -114,7 +114,16 @@ def im2col(X, W_shape, pad, stride):
 
 
 def col2im(X_col, X_shape, W_shape, pad, stride):
+    
     s = stride
+
+    if isinstance(pad, int): 
+        pad = (pad, pad, pad, pad)
+
+    if isinstance(pad, tuple): 
+        if len(pad) == 2:
+            pad = (pad[0], pad[0], pad[1], pad[1])
+
     pr1, pr2, pc1, pc2 = pad
     fr, fc, n_in, n_out = W_shape
     n_ex, in_rows, in_cols, n_in = X_shape

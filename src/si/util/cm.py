@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-
 class ConfusionMatrix:
     def __call__(self, true_y, pred_y):
         self.true_y = np.array(true_y)
