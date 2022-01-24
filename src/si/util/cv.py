@@ -1,9 +1,8 @@
-from si.util.util import train_test_split, add_intersect
+from .util import train_test_split
 import numpy as np
 import itertools
 
 all = ['CrossValidationScore', 'GridSearchCV']
-
 class CrossValidationScore:
 
     def __init__(self, model, dataset, **kwargs):
@@ -19,72 +18,62 @@ class CrossValidationScore:
     def run(self):
         train_scores = []
         test_scores = []
-        ds =  []
-        true_Y,pred_y = [], []
+        ds = []
+
         for _ in range(self.cv):
-            train,test = train_test_split(self.dataset,self.split)
-            ds.append((train,test))
+            train, test = train_test_split(self.dataset, self.split)
+            ds.append((train, test))
             self.model.fit(train)
-        
+
             if not self.score:
                 train_scores.append(self.model.cost())
-                test_scores.append(self.model.cost(test.X,test.Y))
-                pred_Y.extend(list(self.model.predict(test.X)))
+                test_scores.append(self.model.cost(test.X, test.Y))
             else:
-                y_train= np.ma.apply_along_axis(self.model.predict,axis=0, arr=train.X.T)
-                train_scores.append(self.score(train.Y,y_train))
-                y_test = np.ma.apply_along_axis(self.model.predict,axis=0, arr=test.X.T)
+                y_train = np.ma.apply_along_axis(self.model.predict, axis=1, arr=train.X)
+                train_scores.append(self.score(train.Y, y_train))
+                y_test = np.ma.apply_along_axis(self.model.predict, axis=1, arr=test.X)
                 test_scores.append(self.score(test.Y, y_test))
-                pred_Y.extend(list(y_test))
 
-            true_Y.extend(list(test.Y))
         self.train_scores = train_scores
         self.test_scores = test_scores
         self.ds = ds
-        self.true_Y = np.array(true_Y)
-        self.pred_Y = np.array(pred_Y)
-        return train_scores,test_scores
+        return train_scores, test_scores
 
-    
     def toDataframe(self):
-        import pandas as pd 
-        assert self.train_scores and self.test_scores, "tem de correr a função run primeiro"
+        import pandas as pd
         return pd.DataFrame({'Train Scores': self.train_scores, 'Test Scores': self.test_scores})
 
-class GridSearchCV():
-
-    def __init__(self,model,dataset,parameters,**kwargs):
+class GridSearchCV:
+    def __init__(self,model,dataset,parameters, **kwargs):
         self.model = model
-        self.dataset = dataset 
-        hasparam = [hasattr(self.model,param) for param in parameters]
+        self.dataset = dataset
+        hasparam = [hasattr(self.model, param) for param in parameters]
         if np.all(hasparam):
             self.parameters = parameters
         else:
             index = hasparam.index(False)
-            keys= list(parameters.keys())
-            raise ValueError(f" Wrong parameters:{Keys[index]}")
-        self.kwargs = kwargs
+            keys = list(parameters.keys())
+            raise ValueError ( f'Wrong parameters: {keys[index]}')
+        self.kwargs= kwargs
         self.results = None
 
     def run(self):
-        self.results=[]
+        self.results = []
         attrs = list(self.parameters.keys())
         values = list(self.parameters.values())
         for conf in itertools.product(*values):
             for i in range(len(attrs)):
-                setattr(self.model, attrs[i],conf[i])
+                setattr(self.model, attrs[i], conf[i])
             scores = CrossValidationScore(self.model, self.dataset, **self.kwargs).run()
-            self.results.append((conf,scores))
+            self.results.append((conf, scores))
         return self.results
-
     
     def toDataframe(self):
         import pandas as pd
-        #assert self.results, 'The grid search needs to be ran first'
         data = dict()
         for i, k in enumerate(self.parameters.keys()):
-            v = list() 
-            for r in self.results: 
+            v = list()
+            for r in self.results:
                 v.append(r[0][i])
             data[k] = v
         for i in range(len(self.results[0][1][0])):
