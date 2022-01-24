@@ -3,7 +3,7 @@ from numpy.core.numeric import identity
 from numpy.lib.function_base import gradient
 from .model import Model
 from ..util.metrics import mse
-from ..util.util import sigmoid
+from ..util.util import sigmoid, add_intersect
 import numpy as np
 
 class LogisticRegression(Model):
@@ -29,7 +29,7 @@ class LogisticRegression(Model):
     
     def train(self,X,Y):
         n = X.shape[1]
-        self.hsitory = {}
+        self.history = {}
         self.theta = np.zeros(n)
         for epoch in range(self.epochs):
             z = np.dot(X, self.theta)
@@ -38,20 +38,28 @@ class LogisticRegression(Model):
             self.theta -= self.lr * gradient
             self.history[epoch] = [self.theta[:], self.cost()]
 
-    def predict(self,X):
-        p = self.probability(X)
-        res = 1 if p >=0.5 else 0
-        return res
+    def predict(self, x):
+        assert self.is_fitted, 'Model must be fit before predicting'
+        hs = np.hstack(([1], x))
+        p = sigmoid(np.dot(self.theta, hs))
+        if p >= 0.5:
+            res = 1
+        else:
+            res = 0
+            return res
 
     def cost(self, X=None, y=None, theta=None):
         X = add_intersect(X) if X is not None else self.X
-		y = y if y is not None else self.Y
-		theta = theta if theta is not None else self.theta
-		y_pred = np.dot(X, theta)
-		return mse(y, y_pred)/2
-
-
-
+        y = y if y is not None else self.Y
+        theta = theta if theta is not None else self.theta
+        m, n = X.shape
+        h = sigmoid(np.dot(X, theta))
+        cost = (-y * np.log(h) - (1 - y) * np.log(1 - h))
+        res = np.sum(cost) / m
+        return res
+        
+        
+        
 class LogisticRegressionReg:
         
     def __init__(self, epochs=1000, lr=0.1, lbd=1):

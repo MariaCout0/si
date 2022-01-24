@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-class Method(ABC):
+class Model(ABC):
     def __init__(self):
         '''Abstract class defining an interface for supervised learning models'''
         self.is_fitted = False
