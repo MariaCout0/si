@@ -25,7 +25,7 @@ class Layer(ABC):
     def backward(self, output_error, learning_rate):
         raise NotImplementedError
 
-class Dense(Layer):
+class Dense(Layer):             # Receives inputs from previous layers
 
     def __init__(self, input_size, output_size):
         self.weights = np.random.rand(input_size, output_size) - 0.5
@@ -48,16 +48,16 @@ class Dense(Layer):
     def backward(self, output_error, learning_rate):
         '''Computes dE/dW, dE/dB for a given output error = dE/dY
         Returns input error = dE/dX to feed the previous layer'''
-        # computing the weights error: dE/dW = X.T*dE/dY
+        # Computing the weights error: dE/dW = X.T*dE/dY
         weights_error = np.dot(self.input.T, output_error) 
 
-        # bias error dE/dB=dE/dY
+        # Bias error dE/dB=dE/dY
         bias_error = np.sum(output_error, axis=0)
 
-        # error dE/dX to pass on to the previous layer
+        # Error dE/dX to pass on to the previous layer
         input_error = np.dot(output_error, self.weights.T)
 
-        # update parameters
+        # Update parameters to minimiz the loss
         self.weights -= learning_rate*weights_error
         self.bias -= learning_rate*bias_error
         return input_error
@@ -66,7 +66,7 @@ class Dense(Layer):
         self.weights = weights
         self.bias = bias
     
-class Activation(Layer):
+class Activation(Layer):              # Activation defines how the weighted sum of the input is transformed into an output from a node in a layer of the network
     
     def __init__(self, activation):
         self.activation = activation
@@ -103,20 +103,20 @@ class NN(Model):
         self.history = dict()
         for epoch in range(self.epochs):
             output = X
-            # forward propagation
+            # Forward propagation
             for layer in self.layers:
                 output = layer.forward(output)
             
-            # backward propagation
-            error = self.loss_prime(Y, output)  # error based on previous predictions
+            # Backward propagation: the model propagates the error back to the nodes
+            error = self.loss_prime(Y, output)  # Error based on previous predictions
 
-            for layer in reversed(self.layers): # passing the error in an inverse order
+            for layer in reversed(self.layers): 
                 error = layer.backward(error, self.lr)
             
-            # calculate average error on all samples
+            # Calculation of the average error on all samples
             err = self.loss(Y, output)
             self.history[epoch] = err
-            if self.verbose:  # add parameter to print results in epochs
+            if self.verbose:  # Add parameter to print results in epochs
                 print(f"epoch{epoch +1}/{self.epochs} error={err}")
             else:
                 print("\r", f"epoch {epoch +1}/{self.epochs} error = {err}")
@@ -157,7 +157,7 @@ class Conv2D(Layer):
         self.input_shape = input_shape
         self.in_ch = input_shape[2]
         self.out_ch = layer_depth
-        self.stride = stride             #step of the convolution
+        self.stride = stride             # Step of the convolution
         self.padding = padding
         self.weights = np.random.rand(kernel_shape[0],kernel_shape[1],
                                       self.in_ch, self.out_ch) -0.5
@@ -173,11 +173,11 @@ class Conv2D(Layer):
         fr, fc, in_ch, out_ch = self.weights.shape
         n_ex, in_rows, in_cols, in_ch = input_data.shape
 
-        # compute the dimensions of the convolution output
+        # Compute the dimensions of the convolution output
         out_rows = int((in_rows + pr1 + pr2-fr) / s + 1)
         out_cols = int((in_cols + pc1 + pc2 -fc) / s + 1)
 
-        # convert X and w into the appropriate 2D matrices and take their product
+        # Convert X and w into the appropriate 2D matrices and take their product
         self.X_col, _ = im2col(input_data, self.weights.shape, p, s)
         W_col = self.weights.transpose(3, 2, 0, 1).reshape(out_ch, -1)
 
