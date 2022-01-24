@@ -25,8 +25,8 @@ class LinearRegression(Model):
         self.train_gd(X, Y) if self.gd else self.train_closed(X, Y) 
         self.is_fitted = True
     
-    def train_closed(self, X, Y):
-        '''uses closed form linear algebra to fit the model.    # Closed form: finds the optimal value of theta without gradient
+    def train_closed(self, X, Y):           # Closed form: finds the optimal value of theta without gradient
+        '''uses closed form linear algebra to fit the model.    
         theta=inv(XT*X)*XT*y
         '''
         self.theta = np.linalg.inv(X.T.dot(X)).dot(X.T).dot(Y)
