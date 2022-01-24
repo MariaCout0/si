@@ -12,25 +12,24 @@ class PCA:
         self.type = using
     
     def transform(self, dataset):
-        scaled = StandardScaler().fit_transform(dataset).X.T       # scale the features/standardize data
+        scaled = StandardScaler().fit_transform(dataset).X.T      
 
         if self.type.lower()  == "svd": 
             self.u, self.s, self.vh = np.linalg.svd(scaled)
         else:
-            self.cov_matrix = np.cov(scaled)                       # covariance matrix
+            self.cov_matrix = np.cov(scaled)                       # Covariance matrix
             # s are eigenvalues, u are eigenvectors
-            self.s, self.u = np.linalg.eig(self.cov_matrix)        # Compute the eigenvalues and eigenvectors
-        self.idx = np.argsort(self.s)[::-1]                        # sort the indexes (descending order)
-        self.eigen_val =  self.s[self.idx]                         # reorganize by index
-        self.eigen_vect = self.u[:, self.idx]                      # reorganize eigen vectors by column index
+            self.s, self.u = np.linalg.eig(self.cov_matrix)        # Computes the eigenvalues and eigenvectors
+        self.idx = np.argsort(self.s)[::-1]                        # Sorts the indexes (descending order)
+        self.eigen_val =  self.s[self.idx]                         # Reorganization by index
+        self.eigen_vect = self.u[:, self.idx]                      # Reorganization eigen vectors by column index
 
-        self.sub_set_vect = self.eigen_vect[:, :self.ncomponents]  # ordered vectors with principal components 
-        return scaled.T.dot(self.sub_set_vect)                     # features scaled . vetores proprios ordenados
-
+        self.sub_set_vect = self.eigen_vect[:, :self.ncomponents]  # Ordenation of vectors with principal components 
+        return scaled.T.dot(self.sub_set_vect)                     
 
     def variance_explained(self):
         sum_ = np.sum(self.eigen_val)
-        percentage = [i / sum_ * 100 for i in self.eigen_val]       # percentage of the var explained own value / sum of own values * 100
+        percentage = [i / sum_ * 100 for i in self.eigen_val]       # Percentage of the var explained own value / sum of own values * 100
         return np.array(percentage)
     
     def fit_transform(self, dataset):
