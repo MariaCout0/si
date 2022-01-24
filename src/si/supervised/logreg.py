@@ -20,11 +20,10 @@ class LogisticRegression(Model):
 
     def fit(self,dataset):
         X, Y = dataset.getXy()
-        X = np.hstack((np.ones((X.shape[0],1)), X))  # acrescentar o nosso x só com 1 que corresponde ao termo independente
+        X = np.hstack((np.ones((X.shape[0],1)), X))  
         self.X = X
         self.Y = Y
-        # Closed form or GD
-        self.train(X,Y)  # implement closed train form (see notes)
+        self.train(X,Y)  
         self.is_fitted = True
     
     def train(self,X,Y):
