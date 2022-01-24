@@ -19,26 +19,25 @@ class LinearRegression(Model):
 
     def fit(self,dataset):
         X, Y = dataset.getXy()
-        X = np.hstack((np.ones((X.shape[0],1)), X))  # acrescentar o nosso x só com 1 que corresponde ao termo independente
+        X = np.hstack((np.ones((X.shape[0],1)), X))  
         self.X = X
         self.Y = Y
-        # Closed form or GD
-        self.train_gd(X, Y) if self.gd else self.train_closed(X, Y) # implement closed train form (see notes)
+        self.train_gd(X, Y) if self.gd else self.train_closed(X, Y) 
         self.is_fitted = True
     
     def train_closed(self, X, Y):
-        '''uses closed form linear algebra to fit the model.
+        '''uses closed form linear algebra to fit the model.    # Closed form: finds the optimal value of theta without gradient
         theta=inv(XT*X)*XT*y
         '''
         self.theta = np.linalg.inv(X.T.dot(X)).dot(X.T).dot(Y)
         
-    def train_gd(self,X,Y):
-        m = X.shape[0]
+    def train_gd(self,X,Y):               # Gradiente descend (gd): minimizes the cost function of the model                                                    
+        m = X.shape[0]  
         n = X.shape[1]
         self.history = {}
         self.theta = np.zeros(n)
         for epoch in range(self.epochs):
-            grad = 1/m*(X.dot(self.theta)-Y).dot(X)            # gradient by definition
+            grad = 1/m*(X.dot(self.theta)-Y).dot(X)            
             self.theta -= self.lr*grad
             self.history[epoch] = [self.theta[:],self.cost()]
     
@@ -60,7 +59,7 @@ class LinearRegressionReg(LinearRegression):
         :param int epochs: Number of epochs for GD
         :param int lr: Learning rate for GD
         :param float lbd: lambda for the regularization'''
-        super(LinearRegressionReg, self).__init__()         #vai buscar o init da class acima 
+        super(LinearRegressionReg, self).__init__()         
         self.gd = gd
         self.theta = None
         self.epochs = epochs
@@ -83,9 +82,8 @@ class LinearRegressionReg(LinearRegression):
         self.history = {}
         self.theta = np.zeros(n)
         lbds = np.full(m, self.lbd)
-        lbds[0] = 0                                        # so that theta(0) is excluded from regularization form
-        for epoch in range(self.epochs):
-            grad = (X.dot(self.theta)-Y).dot(X)            # gradient by definition
+        lbds[0] = 0                                        
+            grad = (X.dot(self.theta)-Y).dot(X)           
             self.theta -= (self.lr/m) * (lbds+grad)
             self.history[epoch] = [self.theta[:],self.cost()]
 
