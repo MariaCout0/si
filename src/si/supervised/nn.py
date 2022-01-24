@@ -262,8 +262,7 @@ class Pooling2D(Layer):
         dX=dX.reshape(self.X_shape)
         return dX
 
-#Max Pooling é uma operação de pooling que calcula o valor máximo para patches de um mapa de recursos e o usa para criar um mapa de recursos com amostragem reduzida (pool). Geralmente é usado após uma camada convolucional.
-
+# Max Pooling is a pooling operation that calculates the maximum value for patches from a resource map and uses it to create a downsampled resource map (pool). It is usually used after a convolutional layer.
 
 class MaxPooling2D(Pooling2D):
     
