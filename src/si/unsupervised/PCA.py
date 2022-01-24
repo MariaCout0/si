@@ -4,7 +4,7 @@ from si.util.scale import StandardScaler
 class PCA:
 
     def __init__(self, ncomponents = 2, using = "svd"):
-        # ncomponents must be int
+        
         if ncomponents > 0 and isinstance(ncomponents, int):
             self.ncomponents = round(ncomponents)
         else:
@@ -14,7 +14,6 @@ class PCA:
     def transform(self, dataset):
         scaled = StandardScaler().fit_transform(dataset).X.T       # scale the features/standardize data
 
-        # using numpy.linalg.svd:
         if self.type.lower()  == "svd": 
             self.u, self.s, self.vh = np.linalg.svd(scaled)
         else:
@@ -30,10 +29,10 @@ class PCA:
 
 
     def variance_explained(self):
-        # find the explained variance   
         sum_ = np.sum(self.eigen_val)
         percentage = [i / sum_ * 100 for i in self.eigen_val]       # percentage of the var explained own value / sum of own values * 100
-
+        return np.array(percentage)
+    
     def fit_transform(self, dataset):
         trans = self.transform(dataset)
         exp = self.variance_explained()

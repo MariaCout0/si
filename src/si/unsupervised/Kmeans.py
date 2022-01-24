@@ -2,7 +2,7 @@ import numpy as np
 from si.util.util import l2_distance
 from copy import copy
 
-class KMeans:
+class Kmeans:
 
     def __init__(self, k: iter, n_iter=100):
         self.k = k
@@ -16,10 +16,6 @@ class KMeans:
         self._min = np.min(x, axis=0)
         self._max = np.max(x, axis=0)
 
-    # def init_centroids(self, dataset):
-    #     '''Initialize centroids'''
-    #     x = dataset.X
-    #     self.centroids = np.array([np.random.uniform(low=self._min[1], high= self._max[i], size=(self.k,)) for i in range (x.shape[1])]).T
     
     def init_centroids(self, dataset):
         rng = np.random.default_rng()
