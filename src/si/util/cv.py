@@ -49,7 +49,7 @@ class CrossValidationScore:
         import pandas as pd
         return pd.DataFrame({'Train Scores': self.train_scores, 'Test Scores': self.test_scores})
 
-class GridSearchCV:
+class GridSearchCV:                                                 # Grid Search determines better parameters
     def __init__(self,model,dataset,parameters, **kwargs):
         self.model = model
         self.dataset = dataset
