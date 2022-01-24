@@ -8,7 +8,7 @@ def accuracy_score(y_true, y_pred):
     correct = 0
     for true, pred in zip(y_true, y_pred):
         if true == pred:
-            correct += 1                                  # count the correct predictions
+            correct += 1                                  # Counts the correct predictions
     accuracy = correct/len(y_true)
     return accuracy
 
@@ -49,11 +49,11 @@ def r2_score(y_true, y_pred):
     :param numpy.array y_pred : array-like of shape (n_samples,) Estimated target values.
     :returns: score (float) R^2 score.
     """
-    # Residual sum of squares.
+    # Residual sum of squares
     numerator = ((y_true - y_pred) ** 2).sum(axis=0)
-    # Total sum of squares.
+    # Total sum of squares
     denominator = ((y_true - np.average(y_true, axis=0)) ** 2).sum(axis=0)
-    # R^2.
+    # R^2
     score = 1 - numerator / denominator
     return score
 
@@ -83,7 +83,8 @@ class ConfusionMatrix:
 
     def build_matrix(self):
         import pandas as pd
-        #computing a cross tabulation - frequency table of the factors
+        
+        # Computing a cross tabulation - frequency table of the factors
         cm = pd.crosstab(self.true_y,self.predict_y, rownames = ["True values"], colnames = ["Predicted values"])
         return cm
     
