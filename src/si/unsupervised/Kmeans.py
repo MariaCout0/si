@@ -24,7 +24,7 @@ class Kmeans:
     def get_closest_centroid(self, x):
         '''Return the id of the nearest centroid.'''
         dist = self.distance(x, self.centroids)
-        closest_centroids_index = np.argmin(dist, axis = 0)      # Selects centroid with the shortest distance
+        closest_centroids_index = np.argmin(dist, axis = 0)      # Selects the centroid with the shortest distance
         return closest_centroids_index
 
     def transform(self,dataset):
